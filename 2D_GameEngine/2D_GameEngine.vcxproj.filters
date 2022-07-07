@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\ECS">
+      <UniqueIdentifier>{24a63278-fd56-41f9-85d0-fa780abcbeb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -49,6 +52,18 @@
     </ClInclude>
     <ClInclude Include="ECS.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\Components.h">
+      <Filter>Source Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\ECS.h">
+      <Filter>Source Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\SpriteComponent.h">
+      <Filter>Source Files\ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="ECS\PositionComponent.h">
+      <Filter>Source Files\ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

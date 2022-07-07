@@ -148,6 +148,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ECS.h" />
+    <ClInclude Include="ECS\Components.h" />
+    <ClInclude Include="ECS\ECS.h" />
+    <ClInclude Include="ECS\PositionComponent.h" />
+    <ClInclude Include="ECS\SpriteComponent.h" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Map.h" />
