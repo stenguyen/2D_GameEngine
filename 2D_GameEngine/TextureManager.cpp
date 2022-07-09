@@ -6,6 +6,11 @@
 //@returns {sdl_texture} return a pointer to an sdl_texture representing the texture that is to be shown
 SDL_Texture* TextureManager::LoadTexture(const char* texture) {
 
+	/*
+	*	surfaces are pixels stored in SDL2
+	*	textures is image data stored on the GPU
+	*	textures are somewhere on video memory and is easier to access and draw
+	*/
 	//create temp pointer for player that loads a surface
 	//tmpSurface is pixel date used to fill the texture
 	SDL_Surface* tmpSurface = IMG_Load(texture);

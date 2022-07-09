@@ -29,6 +29,8 @@ public:
 
 	//create a static renderer to be accessed throughout the whole program
 	static SDL_Renderer* renderer;
+	//create a static event that is to be accessed throughout the whole program (can't be accidentally changed)
+	static SDL_Event event;
 
 
 private:

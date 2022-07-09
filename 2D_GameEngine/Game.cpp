@@ -1,17 +1,31 @@
 #include "Game.hpp"
 #include "TextureManager.h"
-#include "GameObject.h"
 #include "Map.h"
+#include "ECS/Components.h"
 
-//Create a player object
-GameObject* player;
-//Create an enemy object
-GameObject* enemy;
+//might not have to include this bc it is in transformComponent.h which is in Components.h
+//keep in cuz whatever
+#include "Vector2D.h"
+
+
 //variable for the map object
 Map* map;
+//variable that is used for entity manager
+Manager manager;
 
 //set the renderer in the header file to be null
 SDL_Renderer* Game::renderer = nullptr;
+//create event handler that handles different type of events with name 'event'
+//events are inputs information on current things in the game (mouse input, controller, etc)
+//read events from event queue or place events on event queue
+SDL_Event Game::event;
+
+
+//Create a player entity
+auto& player(manager.addEntity());
+
+
+
 
 //constructor and destructor
 Game::Game(){}
@@ -77,19 +91,22 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 
 	//create a player object with a picture texture and the renderer
 	//give the initial position of the player
-	player = new GameObject("assets/player.png", 0, 0);
-	enemy = new GameObject("assets/buster.png", 50, 50);
+	//player = new GameObject("assets/player.png", 0, 0);
+	//enemy = new GameObject("assets/buster.png", 50, 50);
 
 	//create a map object that has a certain level
 	map = new Map();
 
+	//ecs implementation
+	//add position and sprite component to the newPlayer character
+	player.addComponent<TransformComponent>(0,0);
+	player.addComponent<SpriteComponent>("assets/player.png");
+	player.addComponent<KeyboardController>();
+
 }
 
 void Game::handleEvents(){
-	//create event handler that handles different type of events with name 'event'
-	//events are inputs information on current things in the game (mouse input, controller, etc)
-	//read events from event queue or place events on event queue
-	SDL_Event event;
+
 
 
 	/*
@@ -115,8 +132,23 @@ void Game::handleEvents(){
 void Game::update(){
 	//runs the update command from the GameObject class
 	//-> is another way of saying (*player).updater()
-	player->Update();
-	enemy->Update();
+	//player->Update();
+	//enemy->Update();
+	manager.refresh();
+	manager.update();
+
+	//gets the position(Vector2D) variable in the transform component 
+	//adjust the X and Y by doing operands on it's values
+	//player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
+
+
+	//if the player has an x greater than 100, swap textures
+	//if (player.getComponent<TransformComponent>().position.x > 100) {
+	//	player.getComponent<SpriteComponent>().setTex("assets/buster.png");
+	//}
+
+	//std::cout << player.getComponent<PositionComponent>().x() << "," <<
+	//	player.getComponent<PositionComponent>().y() << std::endl;
 	//use this if you have multiple levels
 	// map->LoadMap();
 }
@@ -133,9 +165,12 @@ void Game::render(){
 
 	//uses Map class to render out image
 	map->DrawMap();
+	manager.draw();
+
+
 	//uses GameObject class to render out player
-	player->Render();
-	enemy->Render();
+	//player->Render();
+	//enemy->Render();
 
 
 

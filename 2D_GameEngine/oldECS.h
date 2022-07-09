@@ -23,7 +23,7 @@ class Entity;
 //size_t is an unsigned int where it can store the maximum size of a theoretically possible array of any type
 //using brings all of ComponentID members into the current scope (ex: using namespace std;)
 //using brings one specific ComponentID member to the current scope (ex: using ComponentID = std::size_t;)
-
+//
 //std::size_t is the type of any sizeof expression and as is guaranteed to be able to 
 //express the maximum size of any object (including any array) in C++
 /*https://stackoverflow.com/questions/2532542/what-does-using-mean-in-c*/
@@ -40,7 +40,7 @@ inline ComponentID getComponentID() {
 }
 
 //create a template function where it returns the componentID by using the getComponentID() function
-// function that is able to be used for more than one certain type
+//function that is able to be used for more than one certain type
 //noexcept is used for exiting a function because an throw is impossbile / unacceptable (noexceptions)
 //https://stackoverflow.com/questions/33210169/how-to-use-noexcept-in-c-or-how-does-it-work
 template <typename T> inline ComponentID getComponentID() noexcept {
@@ -50,15 +50,16 @@ template <typename T> inline ComponentID getComponentID() noexcept {
 	return typeID();
 }
 
-//constant expresion indicates that the value, or return value, is constant and, where possible, is computed at compile time.
+//(constexpr):constant expression indicates that the value, or return value, is constant and, where possible, is computed at compile time.
 //constexpr integral value can be used wherever a const integer is required, such as in template arguments and array declarations.
-//the maximum # of components that something holds
+//maxComponents represents the maximum # of components that an entity holds
 constexpr std::size_t maxComponents = 32;
 
 //stores 32 bits of either 0 or 1, true or false, etc (32 is from the maxComponents variable)
 using ComponentBitSet = std::bitset<maxComponents>;
+
 //takes in a pointer to a component and the # of max components
-//function which compares current current entity and sees if it has a certain component or not
+//function which compares current entity and sees if it has a certain component or not
 using ComponentArray = std::array<Component*, maxComponents>;
 
 //component class which corresponds to an attribute that an entity has
@@ -68,12 +69,12 @@ public:
 	Entity* entity;
 	//virtual is polymorphism
 	//allows the user to change and override the current code
-	virtual void init(){};
-	virtual void update(){};
-	virtual void draw(){};
+	virtual void init() {};
+	virtual void update() {};
+	virtual void draw() {};
 
 	//deconstructor for component
-	virtual ~Component(){}
+	virtual ~Component() {}
 };
 
 class Entity {
