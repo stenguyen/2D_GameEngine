@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "Map.h"
 #include "ECS/Components.h"
+#include "Collision.h"
 
 //might not have to include this bc it is in transformComponent.h which is in Components.h
 //keep in cuz whatever
@@ -23,6 +24,8 @@ SDL_Event Game::event;
 
 //Create a player entity
 auto& player(manager.addEntity());
+//create a wall entity for collision
+auto& wall(manager.addEntity());
 
 
 
@@ -98,11 +101,20 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	map = new Map();
 
 	//ecs implementation
-	//add position and sprite component to the newPlayer character
-	player.addComponent<TransformComponent>(0,0);
+	//add player character with a sprite, (x,y), and input
+	player.addComponent<TransformComponent>(2);
 	player.addComponent<SpriteComponent>("assets/player.png");
 	player.addComponent<KeyboardController>();
+	//add a collider component with a tag of 'player'
+	player.addComponent<ColliderComponent>("player");
 
+	//collision
+	//create a wall that starts at (300,300) with a width of 20 and height of 300. scale of 1
+	//tutorial using height first, then width
+	wall.addComponent<TransformComponent>(300.0f, 300.0f, 20, 300, 1);
+	wall.addComponent<SpriteComponent>("assets/dirt.png");
+	//add a collider component with a tag of 'wall'
+	wall.addComponent<ColliderComponent>("wall");
 }
 
 void Game::handleEvents(){
@@ -134,8 +146,23 @@ void Game::update(){
 	//-> is another way of saying (*player).updater()
 	//player->Update();
 	//enemy->Update();
+
+
+	//delete dead entities
 	manager.refresh();
+
+	//go through the entity list in the ECS.h file and update each entity in a loop
+	//updating each entity will call upon each entities components
+	//each entity has a different update() and refresh component with different attributes
 	manager.update();
+
+	//update later
+	//takes the collider rectangle of the player entity and the wall entity and uses AABB collision to deal with collision
+	if (Collision::AABB(player.getComponent<ColliderComponent>().collider, wall.getComponent<ColliderComponent>().collider)){
+		std::cout << "Wall Hit!" << std::endl;
+		//scales the player down, which automatically changes the collider component
+		player.getComponent<TransformComponent>().scale = 1;
+	}
 
 	//gets the position(Vector2D) variable in the transform component 
 	//adjust the X and Y by doing operands on it's values

@@ -50,6 +50,13 @@ Map::Map() {
 	dest.x = dest.y = 0;
 }
 
+//deconstructor
+Map::~Map() {
+	SDL_DestroyTexture(grass);
+	SDL_DestroyTexture(dirt);
+	SDL_DestroyTexture(water);
+}
+
 //assign the current map level to the real map
 //@params {2D arr} the level we design
 void Map::LoadMap(int arr[20][25]) {

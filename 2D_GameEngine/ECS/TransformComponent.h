@@ -15,15 +15,36 @@ public:
 	Vector2D velocity;
 	int speed = 3;
 
+	//initial height and width 
+	int height = 32;
+	int width = 32;
+	int scale = 1;
+
 	//default constructor that is called without parameters
 	TransformComponent() {
 		position.x = 0.0f;
 		position.y = 0.0f;
 	}
-	//default constructor
+	//constructor that takes in a beginning x and y value
 	TransformComponent(float x, float y) {
 		position.x = x;
 		position.y = y;
+	}
+
+	//constructor that takes in default values and only adjusts the scale itself
+	TransformComponent(int sc) {
+		position.x = 0.0f;
+		position.y = 0.0f;
+		scale = sc;
+	}
+
+	//constructor that takes in the (x,y), initial size, and the scale
+	TransformComponent(float x, float y, int w, int h, int sc) {
+		position.x = x;
+		position.y = y;
+		height = h;
+		width = w;
+		scale = sc;
 	}
 
 	void init() override {
@@ -37,6 +58,5 @@ public:
 	void update() override {
 		position.x += velocity.x * speed;
 		position.y += velocity.y * speed;
-
 	}
 };

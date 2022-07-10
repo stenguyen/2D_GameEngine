@@ -175,7 +175,7 @@ public:
 		//check to see if entity has a component by comparing its total bit string to the identifier of the one being looked for
 		//Check position of the bitSet to see if true or false given the index where the componentID should be located
 		//true if found, false otherwise
-		return ComponentBitSet[getComponentTypeID<T>()];
+		return componentBitSet[getComponentTypeID<T>()];
 	}
 	
 

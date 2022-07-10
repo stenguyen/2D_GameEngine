@@ -23,6 +23,11 @@ public:
 		setTex(path);
 	}
 
+	//eliminate and clear memory
+	~SpriteComponent() {
+		SDL_DestroyTexture(texture);
+	}
+
 	//load texture to current sprite
 	void setTex(const char* path) {
 		texture = TextureManager::LoadTexture(path);
@@ -39,24 +44,29 @@ public:
 		* width and height of the source rectangle
 		* Source rectangle goes from the start of the image (top left / 0,0) 
 		* and copies the pixels until it reaches a certain width and height
-		*/
-		srcRect.w = srcRect.h = 32;
-		
-		/*
-		* copies the image from srcRect and then scales it up or down
-		* so it will fit into the destRect.
 		* 
-		* Use the destRect to push to the screen to display what is needed
-		* scale the image and increase w and h by 2
+		* transform->width/height are the default sizes for the sprites
 		*/
-		destRect.w = destRect.h = 64;
+		srcRect.w = transform->width;
+		srcRect.h = transform->height;
+
 	}
 
 	//update the transform of the x and y to be the current transform
 	//used for rendering out the correct positions on the screen
 	void update() override {
+		/*
+		* copies the image from srcRect and then scales it up or down
+		* so it will fit into the destRect.
+		*
+		* Use the destRect to push to the screen to display what is needed
+		* scale the image and increase w and h by a 'scale' size variable
+		* 
+		*/
 		destRect.x = (int)transform->position.x;
 		destRect.y = (int)transform->position.y;
+		destRect.w = transform->width * transform->scale;
+		destRect.h = transform->height * transform->scale;
 	}
 
 	//using the TextureManager class, draw out onto the screen
