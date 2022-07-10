@@ -4,6 +4,10 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include <iostream>
+#include <vector>
+
+//forward declaration of the ColliderComponent class
+class ColliderComponent;
 
 class Game
 {
@@ -25,12 +29,16 @@ public:
 	//memory management 
 	void clean();
 
-
-
+	//add a tile given the title id and it's (x,y)
+	static void AddTile(int id, int x, int y);
 	//create a static renderer to be accessed throughout the whole program
 	static SDL_Renderer* renderer;
 	//create a static event that is to be accessed throughout the whole program (can't be accidentally changed)
 	static SDL_Event event;
+	//create a vector (a dynamic list) of collider pointers that deals with how an oject collides with another
+	static std::vector<ColliderComponent*> colliders;
+
+
 
 
 private:

@@ -20,6 +20,8 @@
 class Component;
 //the object / thing that holds multiple attributes together
 class Entity;
+//manager class that holds all the entities
+class Manager;
 
 
 
@@ -40,6 +42,13 @@ class Entity;
 * 
 */
 using ComponentID = std::size_t;
+/*
+* typdef for the Group ID which corresponds 
+* to the type that they are (enemy, ally, wall, etc)
+* used for colliders and what happens when touch
+* groups / layers that can be used for render layers and collision layers
+*/
+using Group = std::size_t;
 
 
 /// inline function copies the code from the function definition directly into the code of the calling function
@@ -76,10 +85,14 @@ template <typename T> inline ComponentID getComponentTypeID() noexcept {
 // a constexpr integral value can be used wherever a const integer is required, such as in template arguments and array declarations.
 // maxComponents represents the maximum # of components that an entity holds
 constexpr std::size_t maxComponents = 32;
+//32 groups / layers that can be used for render layers and collision layers
+constexpr std::size_t maxGroups = 32;
+
 
 // stores 32 bits of either 0 or 1, true or false, etc (32 is from the maxComponents variable)
 // used compare whether or not an entity has a certain component or not
 using ComponentBitSet = std::bitset<maxComponents>;
+using GroupBitSet = std::bitset<maxGroups>;
 
 // creates an array of only component pointers with a max size of maxComponents
 // array of all component pointers which points to all the components that an entity has
@@ -90,7 +103,7 @@ class Component {
 public:
 	// has reference to it's owner 
 	// entity corresponds to an entity object which has multiple components
-	Entity* entity;
+	Entity* entity = nullptr;
 
 	// virtual is polymorphism (allows the user to change and override the current code)
 	// will be called after a component is added to an entity
@@ -125,9 +138,11 @@ private:
 	/*
 	*	Array to quickly get a component with a specific ID and a bitset to check
 	*	the existence of a component with a specific ID
+	* 
 	*/
 	ComponentArray componentArray;
 	ComponentBitSet componentBitSet;
+	GroupBitSet groupBitSet;
 
 public:
 	// runs the update function all components

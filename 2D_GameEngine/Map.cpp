@@ -1,99 +1,53 @@
-//include texture manager and the map class
-//texture manager used for texture loading
 #include "Map.h"
-#include "TextureManager.h"
+//for reading file input
+#include <fstream>
+#include "Game.hpp"
 
-//this is only something temporary 
-//plan is to eventually load map from external file
-//first level
-int lvl1[20][25] = {
-	{0,0,0,0,1,1,1,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-};
+
 
 Map::Map() {
-	//use the texture manager to load 
-	//each number corresponds to a different asset
-	dirt = TextureManager::LoadTexture("assets/dirt.png");
-	grass = TextureManager::LoadTexture("assets/grass.png");
-	water = TextureManager::LoadTexture("assets/water.png");
-
-	//load a map given a design
-	LoadMap(lvl1);
-
-	//set the x and y of the source rectangle to be 0
-	src.x = src.y = 0;
-
-	//set the source and the destination to be the same size
-	src.w = dest.w = 32;
-	src.h = dest.h = 32;
-
-	//initialize the destination rectangle on the screen so it's not random
-	dest.x = dest.y = 0;
+	
 }
 
 //deconstructor
 Map::~Map() {
-	SDL_DestroyTexture(grass);
-	SDL_DestroyTexture(dirt);
-	SDL_DestroyTexture(water);
+
 }
 
-//assign the current map level to the real map
-//@params {2D arr} the level we design
-void Map::LoadMap(int arr[20][25]) {
-	for (int row = 0; row < 20; row++) {
-		for (int column = 0; column < 25; column++) {
-			//set the map in the header file to be this size
-			map[row][column] = arr[row][column];
+//load the map given a path to file that has map details
+//sizeX and sizeY is the max size
+void Map::LoadMap(std::string path, int sizeX, int sizeY) {
+	
+	//corresponds to data of a certain tile at position (x,y)
+	//each tile corresponds to a different int which corresponds to a separate sprite
+	//ex: 0 = grass, 1 = water, etc
+	char tile;
+	//set variable that corresponds to file we're loading
+	std::fstream mapFile;
+	//open file
+	mapFile.open(path);
+
+	//loop through the input stream and assign values to tile
+	for (int y = 0; y < sizeY; y++) {
+		for (int x = 0; x < sizeX; x++) {
+			//extracts characters from the stream as unformatted input
+			//assigns the unformatted char into char tile
+			mapFile.get(tile);
+
+			/*
+			* create a tile component given it's id and position
+			* use atoi to convert from char to int
+			* 
+			* multiply x and y by 32 bc each tile is 32 pixels big
+			*/
+			Game::AddTile(atoi(&tile), (x * 32), (y * 32));
+			//ignores the next character in the stream
+			//ignores the commas between the numbers
+			mapFile.ignore();
 		}
 	}
-}
-
-void Map::DrawMap() {
-	//figure out which texture is to be shown
-	int type = 0;
-	for (int row = 0; row < 20; row++) {
-		for (int column = 0; column < 25; column++) {
-			//set tile type to the value in the index of the array
-			type = map[row][column];
-			//when the loop iterates, move across by x # of pixels (32 pixels right if column increases by 1)
-			dest.x = column * 32;
-			dest.y = row * 32;
 
 
-			switch (type) {
-				case 0: // water
-					TextureManager::Draw(water, src, dest);
-					break;
-				case 1: // grass
-					TextureManager::Draw(grass, src, dest);
-					break;
-				case 2: // dirt
-					TextureManager::Draw(dirt, src, dest);
-					break;
-				default:
-					break;
-			}
-
-		}
-	}
+	//close the file
+	mapFile.close();
 }

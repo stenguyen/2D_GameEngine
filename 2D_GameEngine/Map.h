@@ -1,5 +1,6 @@
 #pragma once
-#include "Game.hpp"
+//for the path to be able to function
+#include <string>
 
 class Map
 {
@@ -9,28 +10,12 @@ public:
 	//deconstructor
 	~Map();
 
-	//arr corresponds to map level in 2d array
-	void LoadMap(int arr[20][25]);
-	void DrawMap();
+	//load the map given a path to file that has map details and max width and height 
+	static void LoadMap(std::string path, int sizeX, int sizeY);
 
 
 
 private:
-
-	//holds the source and destination for rendering
-	SDL_Rect src, dest;
-
-	//textures for the titles
-	SDL_Texture* dirt;
-	SDL_Texture* grass;
-	SDL_Texture* water;
-
-	//rows, cols
-	//2D integer array that holds the positions for the map
-	//map is size [20x25]
-	int map[20][25];
-
-
 
 
 

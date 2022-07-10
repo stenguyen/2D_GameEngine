@@ -159,6 +159,7 @@
     <ClInclude Include="ECS\KeyboardController.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="ECS\TileComponent.h" />
     <ClInclude Include="Vector2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

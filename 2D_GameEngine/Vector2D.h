@@ -36,11 +36,17 @@ public:
 	friend Vector2D& operator/(Vector2D& v1, const Vector2D& v2);
 
 
-
+	/*math stuff to a vector*/
 	Vector2D& operator+=(const Vector2D& vec);
 	Vector2D& operator-=(const Vector2D& vec);
 	Vector2D& operator*=(const Vector2D& vec);
 	Vector2D& operator/=(const Vector2D& vec);
+
+	//takes a reference to an integer to multiply vector by scalar number
+	Vector2D& operator*(const int& i);
+	//zero out the vector
+	Vector2D& Zero();
+
 
 	
 	/*

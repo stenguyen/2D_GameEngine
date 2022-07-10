@@ -22,8 +22,7 @@ public:
 
 	//default constructor that is called without parameters
 	TransformComponent() {
-		position.x = 0.0f;
-		position.y = 0.0f;
+		position.Zero();
 	}
 	//constructor that takes in a beginning x and y value
 	TransformComponent(float x, float y) {
@@ -33,8 +32,7 @@ public:
 
 	//constructor that takes in default values and only adjusts the scale itself
 	TransformComponent(int sc) {
-		position.x = 0.0f;
-		position.y = 0.0f;
+		position.Zero();
 		scale = sc;
 	}
 
@@ -48,8 +46,7 @@ public:
 	}
 
 	void init() override {
-		velocity.x = 0;
-		velocity.y = 0;
+		velocity.Zero();
 	}
 
 

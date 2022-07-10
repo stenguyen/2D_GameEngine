@@ -21,11 +21,17 @@ SDL_Renderer* Game::renderer = nullptr;
 //read events from event queue or place events on event queue
 SDL_Event Game::event;
 
+//pointer to a list of collider pointers
+std::vector<ColliderComponent*> Game::colliders;
+
+
+
 
 //Create a player entity
 auto& player(manager.addEntity());
 //create a wall entity for collision
 auto& wall(manager.addEntity());
+
 
 
 
@@ -98,9 +104,11 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	//enemy = new GameObject("assets/buster.png", 50, 50);
 
 	//create a map object that has a certain level
-	map = new Map();
+	//map = new Map();
 
 	//ecs implementation
+	Map::LoadMap("assets/map1.map", 16, 16);
+
 	//add player character with a sprite, (x,y), and input
 	player.addComponent<TransformComponent>(2);
 	player.addComponent<SpriteComponent>("assets/player.png");
@@ -156,17 +164,28 @@ void Game::update(){
 	//each entity has a different update() and refresh component with different attributes
 	manager.update();
 
-	//update later
 	//takes the collider rectangle of the player entity and the wall entity and uses AABB collision to deal with collision
-	if (Collision::AABB(player.getComponent<ColliderComponent>().collider, wall.getComponent<ColliderComponent>().collider)){
-		std::cout << "Wall Hit!" << std::endl;
-		//scales the player down, which automatically changes the collider component
-		player.getComponent<TransformComponent>().scale = 1;
+	//uses a loop that will check all the colliders and does whatever is in the loop
+	for (auto cc : colliders) {
+		//check the current collider and return true if collision is true
+		//*cc is dereferencing the pointer as colliders is a vector of collider pointers
+		Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
+		/*
+			if (Collision::AABB(player.getComponent<ColliderComponent>(), cc*)) {
+
+
+				//scales the player down, which automatically changes the collider component to also scale down
+				player.getComponent<TransformComponent>().scale = 1;
+				//bounces the player the same speed back where they came from (opposite)
+				//bounce back for an entire frame / next update
+				player.getComponent<TransformComponent>().velocity * -1;
+
+				std::cout << "Wall Hit!" << std::endl;
+			}
+		*/
+
 	}
 
-	//gets the position(Vector2D) variable in the transform component 
-	//adjust the X and Y by doing operands on it's values
-	//player.getComponent<TransformComponent>().position.Add(Vector2D(5, 0));
 
 
 	//if the player has an x greater than 100, swap textures
@@ -174,8 +193,7 @@ void Game::update(){
 	//	player.getComponent<SpriteComponent>().setTex("assets/buster.png");
 	//}
 
-	//std::cout << player.getComponent<PositionComponent>().x() << "," <<
-	//	player.getComponent<PositionComponent>().y() << std::endl;
+
 	//use this if you have multiple levels
 	// map->LoadMap();
 }
@@ -189,9 +207,6 @@ void Game::render(){
 	SDL_RenderClear(renderer);
 
 	//this is where we would add stuff to render (bottom then top)
-
-	//uses Map class to render out image
-	map->DrawMap();
 	manager.draw();
 
 
@@ -220,5 +235,15 @@ void Game::clean(){
 	SDL_Quit();
 
 	std::cout << "Game Cleaned!" << std::endl;
+}
+
+
+
+// add a title given it's id and (x,y)
+void Game::AddTile(int id, int x, int y) {
+	//create a tile entity
+	auto& tile(manager.addEntity());
+	//add tile component given position, size, and id type
+	tile.addComponent<TileComponent>(x, y, 32, 32, id);
 }
 

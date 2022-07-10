@@ -114,3 +114,20 @@ std::ostream& operator<<(std::ostream& stream, const Vector2D& vec){
 	return stream;
 }
 
+//takes a reference to an integer to multiply vector by scalar number
+Vector2D& Vector2D::operator*(const int& i) {
+	//multiply (x,y) by a scalar number
+	this->x *= i;
+	this->y *= i;
+
+	//return the reference to itself
+	return *this;
+}
+//zero out the vector and set the position of the object to be the start
+Vector2D& Vector2D::Zero() {
+	this->x = 0;
+	this->y = 0;
+
+	return *this;
+}
+

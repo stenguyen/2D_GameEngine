@@ -6,7 +6,7 @@
 //Used in conjunction with collision.cpp
 class ColliderComponent : public Component {
 public:
-	//collider dimensions
+	//collider rectangle that is used with the collision detection
 	SDL_Rect collider;
 	//when you check collision, find out what type of action must happen
 	//for later
@@ -15,7 +15,8 @@ public:
 	//pointer to transform component that stores and returns x and y values
 	TransformComponent* transform;
 
-	//set the tag of the collider to t
+	//set the tag of the collider to 't'
+	//used for comparing two types of that are interacting (ex: player hits enemy, what do you do)
 	ColliderComponent(std::string t) {
 		tag = t;
 	}
@@ -29,6 +30,9 @@ public:
 
 		//once we are sure transform component exists, set pointer to the transform component
 		transform = &entity->getComponent<TransformComponent>();
+
+		//add a new element at the end of the vector
+		Game::colliders.push_back(this);
 	}
 
 	// adjusts(transforms) the size of the collider hitbox to be same size and position as the entity

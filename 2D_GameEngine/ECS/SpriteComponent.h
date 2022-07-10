@@ -1,6 +1,7 @@
 #pragma once
 #include "Components.h"
 #include "SDL.h"
+#include "../TextureManager.h"
 
 //class constructor that inherits the values and functions from the Component class in ECS
 class SpriteComponent : public Component {
@@ -63,8 +64,8 @@ public:
 		* scale the image and increase w and h by a 'scale' size variable
 		* 
 		*/
-		destRect.x = (int)transform->position.x;
-		destRect.y = (int)transform->position.y;
+		destRect.x = static_cast<int>(transform->position.x);
+		destRect.y = static_cast<int>(transform->position.y);
 		destRect.w = transform->width * transform->scale;
 		destRect.h = transform->height * transform->scale;
 	}
