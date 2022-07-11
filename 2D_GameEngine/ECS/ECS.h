@@ -124,6 +124,8 @@ public:
 
 class Entity {
 private:
+	// reference to the manager object / the thing that stores all entities
+	Manager& manager;
 	// if false, remove from game
 	// is dead or not essentially
 	bool active = true;
@@ -139,12 +141,17 @@ private:
 	*	Array to quickly get a component with a specific ID and a bitset to check
 	*	the existence of a component with a specific ID
 	* 
+	*	group bitset that checks to see if in a certain group or not
 	*/
 	ComponentArray componentArray;
 	ComponentBitSet componentBitSet;
 	GroupBitSet groupBitSet;
 
 public:
+	//Entity constructor that takes in a reference to the manager class that places the current entity to be in the manager that is refereed
+	//thing converting a 
+	Entity(Manager& mManager) : manager(mManager) {};
+
 	// runs the update function all components
 	void update() {
 		//loop through all the components and run the components.update()
@@ -183,6 +190,20 @@ public:
 	// call to make sure the entity is not in use
 	// can be called on any given component bc any given component has a reference to their main entity
 	void destroy() { active = false; }
+	
+	//check to see if the entity is in a group
+	//true or false if a certain bit is 0 or 1 in the bitset
+	bool hasGroup(Group mGroup) {
+		return groupBitSet[mGroup];
+	}
+	//add a group to the entity
+	void addGroup(Group mGroup);
+	//delete a group from the entity by setting the position of it to be false in the bitset
+	//ex: remove from enemy group
+	void delGroup(Group mGroup) {
+		groupBitSet[mGroup] = false;
+	}
+
 
 	// template check to see if given entity has a given component
 	//to check if this entity has a component, query the bitset
@@ -300,6 +321,9 @@ class Manager {
 private:
 	//vector that stores smart pointers of entities
 	std::vector<std::unique_ptr<Entity>> entities;
+
+	//an array of vectors that store entity pointers of size maxGroups
+	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
 public:
 	//update each entity
 	void update() {
@@ -313,6 +337,21 @@ public:
 
 	//function that cleans up and removes all the "dead" entities
 	void refresh() {
+		//i(0u) indicates maximum value of an object of type unsigned int when each bit of its internal representation is set to 1
+		//idk but it is an automated for loop
+		for (auto i(0u); i < maxGroups; i++){
+			//automatically assign v to be the entity in the position of i for each update
+			auto& v(groupedEntities[i]);
+			//remove an entity from a vector if the entity is dead
+			//or if the entity does not have its own group
+			//this is really confusing
+			v.erase(std::remove_if(std::begin(v), std::end(v),
+				[i](Entity* mEntity){
+						return !mEntity->isActive() || !mEntity->hasGroup(i);
+				}),
+				std::end(v));
+		}
+
 		//removes an element / elements from a vector in the range of all entities
 		//remove only if the entity is not active
 		entities.erase(std::remove_if(std::begin(entities), std::end(entities), [](const std::unique_ptr<Entity>& mEntity) {
@@ -320,12 +359,26 @@ public:
 			}),
 			std::end(entities));
 	}
+	//pointer to an entity which adds it to a certain group
+	void AddToGroup(Entity* mEntity, Group mGroup){
+		//add the entity to the end of the vector that stores the certain group
+		//ex: adds the entity to the end of the "enemy" group
+		groupedEntities[mGroup].emplace_back(mEntity);
+	}
+	//returns a vector to the group that we want
+	//returns a list of entities for a given group
+	std::vector<Entity*>& getGroup(Group mGroup){
+		return groupedEntities[mGroup];
+	}
 
 	//add new entity to world
 	//returns a pointer to the entity
 	Entity& addEntity() {
 		// create new entity
-		Entity* e = new Entity();
+		// *this creates a reference to the manager opject in the game class for us to use in the game class
+		// *this allows us to not need to create refernce to the manager in the game class and we can 
+		// just use the pointer to the entity to use it's access to the manager class
+		Entity* e = new Entity(*this);
 		// add the entitiy to the end of the vector of all entities
 		std::unique_ptr<Entity> uPtr{ e };
 		entities.emplace_back(std::move(uPtr));

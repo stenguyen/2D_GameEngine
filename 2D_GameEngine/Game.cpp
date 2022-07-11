@@ -32,7 +32,14 @@ auto& player(manager.addEntity());
 //create a wall entity for collision
 auto& wall(manager.addEntity());
 
-
+//map labels that corresponds to certain groups in the ECS.h group vector
+//search up what enum does
+enum groupLabels : std::size_t{
+	groupMap,
+	groupPlayers,
+	groupEnemies,
+	groupColliders
+};
 
 
 
@@ -115,6 +122,8 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	player.addComponent<KeyboardController>();
 	//add a collider component with a tag of 'player'
 	player.addComponent<ColliderComponent>("player");
+	//add the player to the groupPlayers label
+	player.addGroup(groupPlayers);
 
 	//collision
 	//create a wall that starts at (300,300) with a width of 20 and height of 300. scale of 1
@@ -123,6 +132,8 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	wall.addComponent<SpriteComponent>("assets/dirt.png");
 	//add a collider component with a tag of 'wall'
 	wall.addComponent<ColliderComponent>("wall");
+	//add the wall to the groupMap label
+	wall.addGroup(groupMap);
 }
 
 void Game::handleEvents(){
@@ -198,6 +209,13 @@ void Game::update(){
 	// map->LoadMap();
 }
 
+//set all the tiles in the called group to be in the list with name 'tiles'
+auto& tiles(manager.getGroup(groupMap));
+//set all the players in the called group to be in the list with name 'players'
+auto& players(manager.getGroup(groupPlayers));
+//set all the enemies in the called group to be in the list with name 'enemies'
+auto& enemies(manager.getGroup(groupEnemies));
+
 void Game::render(){
 	/*
 		clears the entire rendering target
@@ -207,13 +225,25 @@ void Game::render(){
 	SDL_RenderClear(renderer);
 
 	//this is where we would add stuff to render (bottom then top)
-	manager.draw();
+	//manager.draw();
 
 
 	//uses GameObject class to render out player
 	//player->Render();
 	//enemy->Render();
 
+	//for all the tiles in the list 'tiles', draw them out
+	for (auto& t : tiles){
+		t->draw();
+	}
+	//for all the players in the list 'players',draw them out
+	for (auto& p : players){
+		p->draw();
+	}
+	//for all the enemies in the list 'enemies', draw them out
+	for (auto& e : enemies){
+		e->draw();
+	}
 
 
 	/*
@@ -245,5 +275,7 @@ void Game::AddTile(int id, int x, int y) {
 	auto& tile(manager.addEntity());
 	//add tile component given position, size, and id type
 	tile.addComponent<TileComponent>(x, y, 32, 32, id);
+	//add the tile to the groupMap
+	tile.addGroup(groupMap);
 }
 
