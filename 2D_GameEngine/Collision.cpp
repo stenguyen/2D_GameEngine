@@ -22,7 +22,8 @@ bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB) {
 bool Collision::AABB(const ColliderComponent& colA, const ColliderComponent& colB) {
 	//check if the two collider rectangles are intersecting / colliding (if true, do this)
 	if(AABB(colA.collider, colB.collider)) {
-		std::cout << colA.tag << "hit: " << colB.tag << std::endl;
+		//std::cout << colA.tag << "hit: " << colB.tag << std::endl;
+		//for debugging
 		return true;
 	}
 	else {

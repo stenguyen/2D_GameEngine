@@ -32,8 +32,13 @@ auto& player(manager.addEntity());
 //create a wall entity for collision
 auto& wall(manager.addEntity());
 
+//all the assets for the map
+//terrain assets, etc
+const char* mapfile = "assets/terrain_ss.png";
+
 //map labels that corresponds to certain groups in the ECS.h group vector
-//search up what enum does
+//each label represents a number and increases on the next one
+//this allows for them to be added to a table easily
 enum groupLabels : std::size_t{
 	groupMap,
 	groupPlayers,
@@ -114,11 +119,13 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	//map = new Map();
 
 	//ecs implementation
-	Map::LoadMap("assets/map1.map", 16, 16);
 
-	//add player character with a sprite, (x,y), and input
-	player.addComponent<TransformComponent>(2);
-	player.addComponent<SpriteComponent>("assets/player.png");
+	//load a map given a 2D array, as well as the max col and rows
+	Map::LoadMap("assets/map.map", 25, 20);
+
+	//add player character with a sprite, (x,y), and the scale of the character
+	player.addComponent<TransformComponent>(4);
+	player.addComponent<SpriteComponent>("assets/player_anims.png", true);
 	player.addComponent<KeyboardController>();
 	//add a collider component with a tag of 'player'
 	player.addComponent<ColliderComponent>("player");
@@ -128,12 +135,12 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	//collision
 	//create a wall that starts at (300,300) with a width of 20 and height of 300. scale of 1
 	//tutorial using height first, then width
-	wall.addComponent<TransformComponent>(300.0f, 300.0f, 20, 300, 1);
-	wall.addComponent<SpriteComponent>("assets/dirt.png");
+	//wall.addComponent<TransformComponent>(300.0f, 300.0f, 20, 300, 1);
+	//wall.addComponent<SpriteComponent>("assets/dirt.png");
 	//add a collider component with a tag of 'wall'
-	wall.addComponent<ColliderComponent>("wall");
+	//wall.addComponent<ColliderComponent>("wall");
 	//add the wall to the groupMap label
-	wall.addGroup(groupMap);
+	//wall.addGroup(groupMap);
 }
 
 void Game::handleEvents(){
@@ -228,7 +235,7 @@ void Game::render(){
 	//manager.draw();
 
 
-	//uses GameObject class to render out player
+	//uses GameObject class to render out player 
 	//player->Render();
 	//enemy->Render();
 
@@ -269,12 +276,12 @@ void Game::clean(){
 
 
 
-// add a title given it's id and (x,y)
-void Game::AddTile(int id, int x, int y) {
+// add a title given it's position on the tilemap and and the position where it is printed on the screen
+void Game::AddTile(int srcX, int srcY, int xpos, int ypos) {
 	//create a tile entity
 	auto& tile(manager.addEntity());
 	//add tile component given position, size, and id type
-	tile.addComponent<TileComponent>(x, y, 32, 32, id);
+	tile.addComponent<TileComponent>(srcX,srcY, xpos, ypos, mapfile);
 	//add the tile to the groupMap
 	tile.addGroup(groupMap);
 }

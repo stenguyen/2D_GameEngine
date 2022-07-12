@@ -29,8 +29,8 @@ public:
 	//memory management 
 	void clean();
 
-	//add a tile given the title id and it's (x,y)
-	static void AddTile(int id, int x, int y);
+	//add a tile given the position of the tile to render from the tilesheet and the (x,y) where it should be placed
+	static void AddTile(int srcX, int srcY, int xpos, int ypos);
 	//create a static renderer to be accessed throughout the whole program
 	static SDL_Renderer* renderer;
 	//create a static event that is to be accessed throughout the whole program (can't be accidentally changed)
