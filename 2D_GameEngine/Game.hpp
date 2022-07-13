@@ -29,20 +29,30 @@ public:
 	//memory management 
 	void clean();
 
-	//add a tile given the position of the tile to render from the tilesheet and the (x,y) where it should be placed
-	static void AddTile(int srcX, int srcY, int xpos, int ypos);
 	//create a static renderer to be accessed throughout the whole program
 	static SDL_Renderer* renderer;
 	//create a static event that is to be accessed throughout the whole program (can't be accidentally changed)
 	static SDL_Event event;
+
 	//create a vector (a dynamic list) of collider pointers that deals with how an oject collides with another
-	static std::vector<ColliderComponent*> colliders;
+	//static std::vector<ColliderComponent*> colliders;
+	
 	//check to see if the game is running
 	static bool isRunning;
 	//camera object that views the player
 	//has width and height (for how much of the screen can be viewed
 	static SDL_Rect camera;
 
+
+	//map labels that corresponds to certain groups in the ECS.h group vector
+	//each label represents a number and increases on the next one
+	//this allows for them to be added to a table easily
+	enum groupLabels : std::size_t {
+		groupMap,
+		groupPlayers,
+		//groupEnemies,
+		groupColliders
+	};
 
 
 

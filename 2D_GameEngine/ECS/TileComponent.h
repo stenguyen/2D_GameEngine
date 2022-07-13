@@ -23,9 +23,11 @@ public:
 	/*
 	*	@params {int}	(srcX,srcY) location of the textures to be loaded on the tilesheet
 	*	@params {int}	(xpos,ypos) Position on the screen where the texture is loaded
+	*	@params {int}	tsize represents the size of the title
+	*	@params {int}	tscale represents # to scale up the tile by
 	*	@params {char*}	path in where the assets are stored
 	*/
-	TileComponent(int srcX, int srcY, int xpos, int ypos, const char* path) {
+	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, const char* path) {
 		//load the texture given the position where it is at
 		texture = TextureManager::LoadTexture(path);
 		//keeps track of where a tile actually is, not just where they are being drawn
@@ -37,14 +39,14 @@ public:
 		srcRect.x = srcX;
 		srcRect.y = srcY;
 		//size of the image we are displaying / size of image on the tilesheet
-		srcRect.w = srcRect.h = 32;
+		srcRect.w = srcRect.h = tsize;
 
 		//printing x and y position on the screen 
 		destRect.x = xpos;
 		destRect.y = ypos;
 		//size of the image on the screen
 		//64 instead of 32 bc we want to double his size
-		destRect.w = destRect.h = 64;
+		destRect.w = destRect.h = tsize*tscale;
 
 	}
 

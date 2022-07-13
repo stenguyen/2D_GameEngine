@@ -25,7 +25,7 @@ SDL_Event Game::event;
 SDL_Rect Game::camera = { 0,0,800,640};
 
 //pointer to a list of collider pointers
-std::vector<ColliderComponent*> Game::colliders;
+//std::vector<ColliderComponent*> Game::colliders;
 
 //bool to check if the game is running or not
 //checks if out of the main menu, etc
@@ -34,33 +34,14 @@ bool Game::isRunning = false;
 
 
 
-
-
 //Create a player entity
 auto& player(manager.addEntity());
-//create a wall entity for collision
-auto& wall(manager.addEntity());
 
-//all the assets for the map
-//terrain assets, etc
-const char* mapfile = "assets/terrain_ss.png";
 
-//map labels that corresponds to certain groups in the ECS.h group vector
-//each label represents a number and increases on the next one
-//this allows for them to be added to a table easily
-enum groupLabels : std::size_t{
-	groupMap,
-	groupPlayers,
-	groupEnemies,
-	groupColliders
-};
 
-//set all the tiles in the called group to be in the list with name 'tiles'
-auto& tiles(manager.getGroup(groupMap));
-//set all the players in the called group to be in the list with name 'players'
-auto& players(manager.getGroup(groupPlayers));
-//set all the enemies in the called group to be in the list with name 'enemies'
-auto& enemies(manager.getGroup(groupEnemies));
+
+
+
 
 
 //constructor and destructor
@@ -131,15 +112,15 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	//enemy = new GameObject("assets/buster.png", 50, 50);
 
 	//create a map object that has a certain level
-	//map = new Map();
+	map = new Map("assets/terrain_ss.png", 3, 32);
 
 	//ecs implementation
 
 	//load a map given a 2D array, as well as the max col and rows
-	Map::LoadMap("assets/map.map", 25, 20);
+	map->LoadMap("assets/map.map", 25, 20);
 
-	//add player character with a sprite, (x,y), and the scale of the character
-	player.addComponent<TransformComponent>(4);
+	//add player character with a sprite, (x,y), and the size and scale of the character
+	player.addComponent<TransformComponent>(800, 640, 32, 32, 4);
 	player.addComponent<SpriteComponent>("assets/player_anims.png", true);
 	player.addComponent<KeyboardController>();
 	//add a collider component with a tag of 'player'
@@ -157,6 +138,13 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	//add the wall to the groupMap label
 	//wall.addGroup(groupMap);
 }
+
+//set all the tiles in the called group to be in the list with name 'tiles'
+auto& tiles(manager.getGroup(Game::groupMap));
+//set all the players in the called group to be in the list with name 'players'
+auto& players(manager.getGroup(Game::groupPlayers));
+//set all the colliders in the called group to be in the list with name 'groupColliders'
+auto& colliders(manager.getGroup(Game::groupColliders));
 
 void Game::handleEvents(){
 
@@ -188,6 +176,10 @@ void Game::update(){
 	//player->Update();
 	//enemy->Update();
 
+	//rectangle corresponding to the player collider at the given call
+	SDL_Rect playerCol = player.getComponent<ColliderComponent>().collider;
+	//corresponds to the (x,y) of the player at the given call
+	Vector2D playerPos = player.getComponent<TransformComponent>().position;
 
 	//delete dead entities
 	manager.refresh();
@@ -197,6 +189,18 @@ void Game::update(){
 	//each entity has a different update() and refresh component with different attributes
 	manager.update();
 
+	//loop through all the colliders to check if player has collided with a collider
+	for (auto& c : colliders) {
+		//variable that holds a collider to be compared
+		SDL_Rect cCol = c->getComponent<ColliderComponent>().collider;
+		//look for collision with AABB
+		if (Collision::AABB(cCol, playerCol)) {
+			//if the player did collide, set the player back to where they were before they collided
+			//go back in time and retrieve the players old (x,y) state
+			player.getComponent<TransformComponent>().position = playerPos;
+		}
+	}
+
 	//center the camera on the player
 	//camera.x = player.getComponent<TransformComponent>().position.x - (int)((32 * player.getComponent<TransformComponent>().scale) / 2);
 	//camera.y = player.getComponent<TransformComponent>().position.y - (int)((32 * player.getComponent<TransformComponent>().scale) / 2);
@@ -204,6 +208,7 @@ void Game::update(){
 	//create a rectangle that centers itself aroudn the player
 	//the camera is half the size of the window screen and acts as a buffer between the window edge and the player
 	//if bounding camera box touches the edge, stop the camera from moving and bind it to the edge until the player moves away
+	//can probably make an easier varaible to determine half the size of the width and height
 	camera.x = player.getComponent<TransformComponent>().position.x - 400;
 	camera.y = player.getComponent<TransformComponent>().position.y - 320;
 
@@ -301,13 +306,13 @@ void Game::render(){
 	for (auto& t : tiles){
 		t->draw();
 	}
+	//for all the colliders in the list 'colliders', draw them out
+	for (auto& c : colliders) {
+		c->draw();
+	}
 	//for all the players in the list 'players',draw them out
 	for (auto& p : players){
 		p->draw();
-	}
-	//for all the enemies in the list 'enemies', draw them out
-	for (auto& e : enemies){
-		e->draw();
 	}
 
 
@@ -331,16 +336,3 @@ void Game::clean(){
 
 	std::cout << "Game Cleaned!" << std::endl;
 }
-
-
-
-// add a title given it's position on the tilemap and and the position where it is printed on the screen
-void Game::AddTile(int srcX, int srcY, int xpos, int ypos) {
-	//create a tile entity
-	auto& tile(manager.addEntity());
-	//add tile component given position, size, and id type
-	tile.addComponent<TileComponent>(srcX,srcY, xpos, ypos, mapfile);
-	//add the tile to the groupMap
-	tile.addGroup(groupMap);
-}
-
