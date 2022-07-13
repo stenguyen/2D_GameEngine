@@ -9,6 +9,8 @@ class TileComponent : public Component
 public:
 	SDL_Texture* texture;
 	SDL_Rect srcRect, destRect;
+	//represents where the tiles actually are in the game world
+	Vector2D position;
 
 	//default constructor for individual tiles
 	TileComponent() = default;
@@ -26,6 +28,11 @@ public:
 	TileComponent(int srcX, int srcY, int xpos, int ypos, const char* path) {
 		//load the texture given the position where it is at
 		texture = TextureManager::LoadTexture(path);
+		//keeps track of where a tile actually is, not just where they are being drawn
+		//can be used with the vector of tiles to check and see positions
+		position.x = xpos;
+		position.y = ypos;
+
 		//positions to serach the texture in order to find out where the texture is actually loaded
 		srcRect.x = srcX;
 		srcRect.y = srcY;
@@ -40,11 +47,23 @@ public:
 		destRect.w = destRect.h = 64;
 
 	}
-	
+
+	// updates the place where the objects are rendered to
+	// really no idea wtf is happen
+	//think it makes search that the camera is following the palyer or smt
+	void update() override {
+		//the position where the player should be drawn
+		//subtracts the real / inital position of the tile with the camera position
+		destRect.x = position.x - Game::camera.x;
+		destRect.y = position.y - Game::camera.y;
+	}
+
+
 	//override the default drawing method
 	void draw() override {
 		//use the texture manager draw function and draw out the tile
 		TextureManager::Draw(texture, srcRect, destRect, SDL_FLIP_NONE);
 	}
+
 
 };

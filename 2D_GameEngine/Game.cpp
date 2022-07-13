@@ -21,8 +21,17 @@ SDL_Renderer* Game::renderer = nullptr;
 //read events from event queue or place events on event queue
 SDL_Event Game::event;
 
+//camera rectangle that has initial position of 0,0 and the max width and height of the screen
+SDL_Rect Game::camera = { 0,0,800,640};
+
 //pointer to a list of collider pointers
 std::vector<ColliderComponent*> Game::colliders;
+
+//bool to check if the game is running or not
+//checks if out of the main menu, etc
+bool Game::isRunning = false;
+
+
 
 
 
@@ -46,6 +55,12 @@ enum groupLabels : std::size_t{
 	groupColliders
 };
 
+//set all the tiles in the called group to be in the list with name 'tiles'
+auto& tiles(manager.getGroup(groupMap));
+//set all the players in the called group to be in the list with name 'players'
+auto& players(manager.getGroup(groupPlayers));
+//set all the enemies in the called group to be in the list with name 'enemies'
+auto& enemies(manager.getGroup(groupEnemies));
 
 
 //constructor and destructor
@@ -182,12 +197,60 @@ void Game::update(){
 	//each entity has a different update() and refresh component with different attributes
 	manager.update();
 
+	//center the camera on the player
+	//camera.x = player.getComponent<TransformComponent>().position.x - (int)((32 * player.getComponent<TransformComponent>().scale) / 2);
+	//camera.y = player.getComponent<TransformComponent>().position.y - (int)((32 * player.getComponent<TransformComponent>().scale) / 2);
+
+	//create a rectangle that centers itself aroudn the player
+	//the camera is half the size of the window screen and acts as a buffer between the window edge and the player
+	//if bounding camera box touches the edge, stop the camera from moving and bind it to the edge until the player moves away
+	camera.x = player.getComponent<TransformComponent>().position.x - 400;
+	camera.y = player.getComponent<TransformComponent>().position.y - 320;
+
+	//if the camera is moving to the left pass the map, stop the camera
+	if (camera.x < 0) {
+		camera.x = 0;
+	}
+	//if the camera is moving up pass the map, stop the camera
+	if (camera.y < 0) {
+		camera.y = 0;
+	}
+	//if the camera is moving to the right pass the map, stop the camera
+	//camera.w is just the last position of the map / wdith of the map
+	if (camera.x > camera.w) {
+		camera.x = camera.w;
+	}
+	//if the camera is moving down up pass the map, stop the camera
+	//camera.h is just the last position of the map / height of the map
+	if (camera.y > camera.h) {
+		camera.y = camera.h;
+	}
+
+
+	// retrieve the player velocity and player speed
+	//used to control how fast the camera moves while following the player
+	//Vector2D pVel = player.getComponent<TransformComponent>().velocity;
+	//int pSpeed = player.getComponent<TransformComponent>().speed;
+
+	//for (auto t : tiles) {
+		/*
+		*	move the tiles the inverse of the direction that the player is moving
+		*	tiles move the same speed as the player
+		* 
+		*	ex: if the player is moving up, move the map downwards to fake that the player is actually moving himself upwards
+		*	shit is really memory and resource intensive... gotta fix
+		* 
+		*/
+	//	t->getComponent<TileComponent>().destRect.x += -(pVel.x * pSpeed);
+	//	t->getComponent<TileComponent>().destRect.y += -(pVel.y * pSpeed);
+	//}
+
 	//takes the collider rectangle of the player entity and the wall entity and uses AABB collision to deal with collision
 	//uses a loop that will check all the colliders and does whatever is in the loop
-	for (auto cc : colliders) {
+	//for (auto cc : colliders) {
 		//check the current collider and return true if collision is true
 		//*cc is dereferencing the pointer as colliders is a vector of collider pointers
-		Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
+	//	Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
 		/*
 			if (Collision::AABB(player.getComponent<ColliderComponent>(), cc*)) {
 
@@ -202,7 +265,7 @@ void Game::update(){
 			}
 		*/
 
-	}
+	//}
 
 
 
@@ -216,12 +279,7 @@ void Game::update(){
 	// map->LoadMap();
 }
 
-//set all the tiles in the called group to be in the list with name 'tiles'
-auto& tiles(manager.getGroup(groupMap));
-//set all the players in the called group to be in the list with name 'players'
-auto& players(manager.getGroup(groupPlayers));
-//set all the enemies in the called group to be in the list with name 'enemies'
-auto& enemies(manager.getGroup(groupEnemies));
+
 
 void Game::render(){
 	/*

@@ -140,13 +140,14 @@ public:
 		/*
 		* copies the image from srcRect and then scales it up or down
 		* so it will fit into the destRect.
+		* destRect subtracts the camera.x and y in order to allow the camera to move as the same speed of the player
 		*
 		* Use the destRect to push to the screen to display what is needed
 		* scale the image and increase w and h by a 'scale' size variable
 		* 
 		*/
-		destRect.x = static_cast<int>(transform->position.x);
-		destRect.y = static_cast<int>(transform->position.y);
+		destRect.x = static_cast<int>(transform->position.x) - Game::camera.x;
+		destRect.y = static_cast<int>(transform->position.y) - Game::camera.y;
 		destRect.w = transform->width * transform->scale;
 		destRect.h = transform->height * transform->scale;
 	}
@@ -170,6 +171,5 @@ public:
 		animIndex = animations[animName].index;
 		//the delay between frames in milliseconds / speed of the animation 
 		speed = animations[animName].speed;
-
 	}
 };

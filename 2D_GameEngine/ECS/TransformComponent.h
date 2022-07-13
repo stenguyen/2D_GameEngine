@@ -32,7 +32,9 @@ public:
 
 	//constructor that takes in default values and only adjusts the scale itself
 	TransformComponent(int sc) {
-		position.Zero();
+		//rougly the center of the screen
+		position.x = 400;
+		position.y = 320;
 		scale = sc;
 	}
 
@@ -51,7 +53,7 @@ public:
 
 
 	//override the inherited update() command and do this instead
-	//move the player a certain amount 
+	//move the player a certain speed*velocity across the map
 	void update() override {
 		position.x += velocity.x * speed;
 		position.y += velocity.y * speed;

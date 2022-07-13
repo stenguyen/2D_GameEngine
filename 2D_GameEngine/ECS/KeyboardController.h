@@ -84,7 +84,9 @@ public:
 				transform->velocity.y = 0;
 				sprite->Play("Idle");
 				break;
-
+			//after you press escape and let go, the game will quit
+			case SDLK_ESCAPE:
+				Game::isRunning = false;
 			default:
 				break;
 			}

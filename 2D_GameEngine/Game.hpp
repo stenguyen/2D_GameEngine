@@ -37,12 +37,16 @@ public:
 	static SDL_Event event;
 	//create a vector (a dynamic list) of collider pointers that deals with how an oject collides with another
 	static std::vector<ColliderComponent*> colliders;
+	//check to see if the game is running
+	static bool isRunning;
+	//camera object that views the player
+	//has width and height (for how much of the screen can be viewed
+	static SDL_Rect camera;
 
 
 
 
 private:
 	int cnt; //counter variable
-	bool isRunning;
 	SDL_Window* window;
 };
