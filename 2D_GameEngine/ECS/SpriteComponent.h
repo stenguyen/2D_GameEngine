@@ -5,6 +5,7 @@
 #include "Animation.h""
 //hold the animation using a std::map
 #include <map>
+#include "../AssetManager.h"
 
 //class constructor that inherits the values and functions from the Component class in ECS
 class SpriteComponent : public Component {
@@ -50,9 +51,10 @@ public:
 	SpriteComponent() = default;
 
 	//@params {char} path to the texture we are going to use
-	//returns a sprite object that we can render to the screen with a certain texture
-	SpriteComponent(const char* path) {
-		setTex(path);
+	//returns a sprite object that we can render to the screen with a certain texture and the path to the texture
+	SpriteComponent(std::string id){
+		//setTex(path);
+		setTex(id);
 	}
 
 	/*
@@ -64,7 +66,7 @@ public:
 	*	returns a sprite object that we can render to the screen with a certain texture
 	*/
 
-	SpriteComponent(const char* path, bool isAnimated) {
+	SpriteComponent(std::string id , bool isAnimated) {
 		//the entity is animated
 		animated = isAnimated;
 
@@ -73,21 +75,22 @@ public:
 		Animation walk = Animation(1, 8, 100);
 
 		//add the animations to the std::map
+		//only adds it once for the first creation of a sprite
 		animations.emplace("Idle", idle);
 		animations.emplace("Walk", walk);
 
 		Play("Idle");
-		setTex(path);
+		//setTex(path);
+		setTex(id);
 	}
 
 	//eliminate and clear memory
 	~SpriteComponent() {
-		SDL_DestroyTexture(texture);
 	}
 
 	//load texture to current sprite
-	void setTex(const char* path) {
-		texture = TextureManager::LoadTexture(path);
+	void setTex(std::string id) {
+		texture = Game::assets->GetTexture(id);
 	}
 	
 	//initialize the sprite component

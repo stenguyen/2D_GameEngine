@@ -3,10 +3,14 @@
 #include "Map.h"
 #include "ECS/Components.h"
 #include "Collision.h"
+#include "AssetManager.h"
+//to update the text dynamically
+#include <sstream>
 
 //might not have to include this bc it is in transformComponent.h which is in Components.h
 //keep in cuz whatever
 #include "Vector2D.h"
+//#include "AssetManager.h"
 
 
 //variable for the map object
@@ -23,6 +27,8 @@ SDL_Event Game::event;
 
 //camera rectangle that has initial position of 0,0 and the max width and height of the screen
 SDL_Rect Game::camera = { 0,0,800,640};
+//create an asset manager that points to the entity manager declared above
+AssetManager* Game::assets = new AssetManager(&manager);
 
 //pointer to a list of collider pointers
 //std::vector<ColliderComponent*> Game::colliders;
@@ -36,8 +42,8 @@ bool Game::isRunning = false;
 
 //Create a player entity
 auto& player(manager.addEntity());
-
-
+//add a label entity that displays text on the screen
+auto& label(manager.addEntity());
 
 
 
@@ -105,14 +111,26 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	else { //if something cannot initialize, game is not running
 		isRunning = false;
 	}
+	//if you can't declare text
+	if (TTF_Init() == -1) {
+		std::cout << "Error : SDL_TTF" << std::endl;
+	}
 
 	//create a player object with a picture texture and the renderer
 	//give the initial position of the player
 	//player = new GameObject("assets/player.png", 0, 0);
 	//enemy = new GameObject("assets/buster.png", 50, 50);
 
+	//create textures and assign it to the vector map thing for use later
+	assets->AddTexture("terrain", "assets/terrain_ss.png");
+	assets->AddTexture("player", "assets/player_anims.png");
+	assets->AddTexture("projectile", "assets/proj.png");
+
+	//add font to asset manager
+	assets->AddFont("arial", "assets/arial.ttf", 16);
+
 	//create a map object that has a certain level
-	map = new Map("assets/terrain_ss.png", 3, 32);
+	map = new Map("terrain", 3, 32);
 
 	//ecs implementation
 
@@ -120,13 +138,26 @@ void Game::init(const char *title, int xpos, int ypos, int width, int height, bo
 	map->LoadMap("assets/map.map", 25, 20);
 
 	//add player character with a sprite, (x,y), and the size and scale of the character
-	player.addComponent<TransformComponent>(800, 640, 32, 32, 4);
-	player.addComponent<SpriteComponent>("assets/player_anims.png", true);
+	player.addComponent<TransformComponent>(800.0f, 640.0f, 32, 32, 4);
+	player.addComponent<SpriteComponent>("player", true);
 	player.addComponent<KeyboardController>();
 	//add a collider component with a tag of 'player'
 	player.addComponent<ColliderComponent>("player");
 	//add the player to the groupPlayers label
 	player.addGroup(groupPlayers);
+
+	//create an sdl colour to use with the label
+	SDL_Color white = { 255,255,255,255 };
+	//10 pixels down, 10 pixels right, font, and colour
+	label.addComponent<UILabel>(10, 10, "Test String", "arial", white);
+
+
+	//create a projectile
+	//increasing the second vector2D changes the angle in which it is fired
+	assets->CreateProjectile(Vector2D(600, 600), Vector2D(2, 0), 200, 2, "projectile");
+	assets->CreateProjectile(Vector2D(600, 620), Vector2D(2, 0), 200, 2, "projectile");
+	assets->CreateProjectile(Vector2D(400, 600), Vector2D(2, 1), 200, 2, "projectile");
+	assets->CreateProjectile(Vector2D(600, 600), Vector2D(2, -1), 200, 2, "projectile");
 
 	//collision
 	//create a wall that starts at (300,300) with a width of 20 and height of 300. scale of 1
@@ -145,7 +176,8 @@ auto& tiles(manager.getGroup(Game::groupMap));
 auto& players(manager.getGroup(Game::groupPlayers));
 //set all the colliders in the called group to be in the list with name 'groupColliders'
 auto& colliders(manager.getGroup(Game::groupColliders));
-
+//set all the projectiles in the called group to be in the list with name 'groupProjectiles'
+auto& projectiles(manager.getGroup(Game::groupProjectiles));
 void Game::handleEvents(){
 
 
@@ -181,6 +213,16 @@ void Game::update(){
 	//corresponds to the (x,y) of the player at the given call
 	Vector2D playerPos = player.getComponent<TransformComponent>().position;
 
+	//variable that basically holds an output stream
+	//basically holds cout stuff and places it into the variable ss
+	std::stringstream ss;
+	//dynamically print out the position of the player after each frame
+	ss << "Player Position: " << playerPos;
+	//add the UILabel component to the entity
+	//'ss.str()' would be the string from the output stream with 'arial' as the font
+	label.getComponent<UILabel>().SetLabelText(ss.str(), "arial");
+
+
 	//delete dead entities
 	manager.refresh();
 
@@ -200,6 +242,17 @@ void Game::update(){
 			player.getComponent<TransformComponent>().position = playerPos;
 		}
 	}
+	//check collision for projectiles against player
+	for (auto& p : projectiles) {
+		//reason we do not use playerCol is bc we need to update the position after its done all its other collision detection
+		if (Collision::AABB(player.getComponent<ColliderComponent>().collider, p->getComponent<ColliderComponent>().collider)) {
+			//this is where we add a health / damage component to the collider
+			std::cout << "hit player" << std::endl;
+			p->destroy();
+
+		}
+	}
+	
 
 	//center the camera on the player
 	//camera.x = player.getComponent<TransformComponent>().position.x - (int)((32 * player.getComponent<TransformComponent>().scale) / 2);
@@ -314,6 +367,11 @@ void Game::render(){
 	for (auto& p : players){
 		p->draw();
 	}
+	//for all the projectiles in the list 'projectiles', draw them out after the player
+	for (auto& p : projectiles) {
+		p->draw();
+	}
+	label.draw();
 
 
 	/*

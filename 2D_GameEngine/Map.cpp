@@ -16,14 +16,16 @@
 extern Manager manager;
 
 /*
-*	@params {char*} represents the map file path to load and get the map
+*	@params {char*} represents the map file path to load and get the map (const char* mfp) (not anymore
+*	@params {tId}	represents an index to the asset manager that corresponds to an asset
 *	@params {int}	ms represents the map scale that will increase or decrease the size of the map
 *	@params {int}	ts represents the size of the idividual tiles
 * 
 *	@returns	constucts a map class with components that lead to less magic numbers and loads the maps
 */
-Map::Map(const char* mfp, int ms, int ts) {
-	mapFilePath = mfp;
+Map::Map(std::string tID, int ms, int ts) {
+	//: texID(tID), mapScale(ms), tileSize(ts)
+	texID = tID;
 	mapScale = ms;
 	tileSize = ts;
 	scaledSize = ms * ts;
@@ -132,7 +134,7 @@ void Map::AddTile(int srcX, int srcY, int xpos, int ypos) {
 	//create a tile entity
 	auto& tile(manager.addEntity());
 	//add tile component given position, size, and id type
-	tile.addComponent<TileComponent>(srcX, srcY, xpos, ypos, tileSize, mapScale, mapFilePath);
+	tile.addComponent<TileComponent>(srcX, srcY, xpos, ypos, tileSize, mapScale, texID);
 	//add the tile to the groupMap (enum definition in game.hpp)
 	tile.addGroup(Game::groupMap);
 }

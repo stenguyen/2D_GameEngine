@@ -6,7 +6,7 @@ class Map
 {
 public:
 	//constructor
-	Map(const char* mfp, int ms, int ts);
+	Map(std::string tID, int ms, int ts);
 	//deconstructor
 	~Map();
 
@@ -17,7 +17,9 @@ public:
 
 
 private:
-	const char* mapFilePath;
+	//const char* mapFilePath;
+	//texture id that represents the id for texture in asset manager
+	std::string texID;
 	int mapScale;
 	int tileSize;
 	//represents mapscale*tilesize

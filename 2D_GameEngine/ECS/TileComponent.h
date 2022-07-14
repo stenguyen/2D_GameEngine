@@ -3,6 +3,7 @@
 #include "ECS.h"
 //#include "TransformComponent.h"
 #include "SDL.h"
+#include "../AssetManager.h"
 
 class TileComponent : public Component
 {
@@ -21,15 +22,15 @@ public:
 	}
 	
 	/*
-	*	@params {int}	(srcX,srcY) location of the textures to be loaded on the tilesheet
-	*	@params {int}	(xpos,ypos) Position on the screen where the texture is loaded
-	*	@params {int}	tsize represents the size of the title
-	*	@params {int}	tscale represents # to scale up the tile by
-	*	@params {char*}	path in where the assets are stored
+	*	@params {int}		(srcX,srcY) location of the textures to be loaded on the tilesheet
+	*	@params {int}		(xpos,ypos) Position on the screen where the texture is loaded
+	*	@params {int}		tsize represents the size of the title
+	*	@params {int}		tscale represents # to scale up the tile by
+	*	@params {string}	texture id that represents a key in the asset manager map
 	*/
-	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, const char* path) {
+	TileComponent(int srcX, int srcY, int xpos, int ypos, int tsize, int tscale, std::string id) {
 		//load the texture given the position where it is at
-		texture = TextureManager::LoadTexture(path);
+		texture = Game::assets->GetTexture(id);
 		//keeps track of where a tile actually is, not just where they are being drawn
 		//can be used with the vector of tiles to check and see positions
 		position.x = xpos;
